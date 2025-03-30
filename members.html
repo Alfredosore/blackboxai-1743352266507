@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Members | Group Contribution Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script type="module" src="script.js"></script>
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-blue-600 text-white p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Group Savings</h1>
+      <div class="space-x-4">
+        <a href="index.html" class="hover:underline"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="members.html" class="hover:underline font-bold"><i class="fas fa-users"></i> Members</a>
+        <a href="contributions.html" class="hover:underline"><i class="fas fa-hand-holding-usd"></i> Contribute</a>
+        <a href="goals.html" class="hover:underline"><i class="fas fa-bullseye"></i> Goals</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mx-auto p-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-6">Member Contributions</h2>
+      
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Contributed</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Contribution</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="members-table" class="bg-white divide-y divide-gray-200">
+            <!-- Will be populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-gray-800 text-white p-4 mt-8">
+    <div class="container mx-auto text-center">
+      <p>Group Contribution Tracker &copy; 2023</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const membersTable = document.getElementById('members-table');
+      const { members } = require('./data.js');
+      
+      members.forEach(member => {
+        const total = member.contributions.reduce((sum, c) => sum + c.amount, 0);
+        const lastContribution = member.contributions.length > 0 
+          ? new Date(member.contributions[member.contributions.length-1].date).toLocaleDateString()
+          : 'Never';
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <i class="fas fa-user text-blue-600"></i>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-gray-900">${member.name}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            $${total.toFixed(2)}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            ${lastContribution}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <a href="#" class="text-blue-600 hover:text-blue-900">View History</a>
+          </td>
+        `;
+        membersTable.appendChild(row);
+      });
+    });
+  </script>
+</body>
+</html>
