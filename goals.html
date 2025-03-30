@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goals | Group Contribution Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script type="module" src="script.js"></script>
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-blue-600 text-white p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Group Savings</h1>
+      <div class="space-x-4">
+        <a href="index.html" class="hover:underline"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="members.html" class="hover:underline"><i class="fas fa-users"></i> Members</a>
+        <a href="contributions.html" class="hover:underline"><i class="fas fa-hand-holding-usd"></i> Contribute</a>
+        <a href="goals.html" class="hover:underline font-bold"><i class="fas fa-bullseye"></i> Goals</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mx-auto p-6">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-6">Savings Goals</h2>
+      
+      <div class="mb-8">
+        <h3 class="text-lg font-medium mb-4">Current Goal Progress</h3>
+        <div class="mb-4">
+          <div class="flex justify-between mb-1">
+            <span class="text-sm font-medium" id="goal-progress-text">$0 of $3000 (0%)</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div id="goal-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-blue-50 p-3 rounded-lg">
+            <p class="text-sm text-gray-600">Target Amount</p>
+            <p id="target-amount" class="text-xl font-bold">$3000</p>
+          </div>
+          <div class="bg-green-50 p-3 rounded-lg">
+            <p class="text-sm text-gray-600">Amount Saved</p>
+            <p id="saved-amount" class="text-xl font-bold">$0</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t pt-6">
+        <h3 class="text-lg font-medium mb-4">Set New Goal</h3>
+        <form id="goal-form" class="space-y-4">
+          <div>
+            <label for="new-goal" class="block text-sm font-medium text-gray-700">New Target Amount</label>
+            <div class="mt-1 relative rounded-md shadow-sm">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span class="text-gray-500 sm:text-sm">$</span>
+              </div>
+              <input type="number" id="new-goal" class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md" placeholder="3000" min="1">
+            </div>
+          </div>
+          
+          <div class="flex space-x-4">
+            <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md">
+              <i class="fas fa-save mr-2"></i> Update Goal
+            </button>
+            <button type="button" id="reset-goal" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md">
+              <i class="fas fa-redo mr-2"></i> Reset Progress
+            </button>
+          </div>
+        </form>
+        
+        <div id="goal-message" class="hidden mt-4 p-4 rounded"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-gray-800 text-white p-4 mt-8">
+    <div class="container mx-auto text-center">
+      <p>Group Contribution Tracker &copy; 2023</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const { groupGoal, totalContributed } = require('./data.js');
+      
+      // Initialize goal display
+      updateGoalDisplay();
+      
+      // Goal form submission
+      const goalForm = document.getElementById('goal-form');
+      goalForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newGoal = parseFloat(document.getElementById('new-goal').value);
+        if (newGoal && newGoal > 0) {
+          groupGoal = newGoal;
+          localStorage.setItem('groupGoal', groupGoal);
+          updateGoalDisplay();
+          showMessage('Goal updated successfully!', 'success');
+        } else {
+          showMessage('Please enter a valid goal amount', 'error');
+        }
+      });
+      
+      // Reset progress button
+      document.getElementById('reset-goal').addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset all contributions? This cannot be undone.')) {
+          totalContributed = 0;
+          localStorage.setItem('totalContributed', totalContributed);
+          updateGoalDisplay();
+          showMessage('Progress has been reset', 'info');
+        }
+      });
+      
+      function updateGoalDisplay() {
+        const percentage = Math.min(100, (totalContributed / groupGoal) * 100);
+        document.getElementById('goal-progress-bar').style.width = `${percentage}%`;
+        document.getElementById('goal-progress-text').textContent = 
+          `$${totalContributed} of $${groupGoal} (${percentage.toFixed(1)}%)`;
+        document.getElementById('target-amount').textContent = `$${groupGoal}`;
+        document.getElementById('saved-amount').textContent = `$${totalContributed}`;
+      }
+      
+      function showMessage(text, type) {
+        const messageEl = document.getElementById('goal-message');
+        messageEl.textContent = text;
+        messageEl.className = `mt-4 p-4 rounded ${type === 'success' ? 'bg-green-100 text-green-700' : 
+                              type === 'error' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`;
+        messageEl.classList.remove('hidden');
+        
+        setTimeout(() => {
+          messageEl.classList.add('hidden');
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
