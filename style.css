@@ -1,0 +1,40 @@
+/* Custom styles to complement Tailwind */
+.progress-container {
+  position: relative;
+  height: 1.5rem;
+  overflow: hidden;
+  background-color: #e5e7eb;
+  border-radius: 0.75rem;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 0.75rem;
+  transition: width 0.3s ease;
+}
+
+/* Animation for success messages */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.success-message {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive table */
+@media (max-width: 640px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* Custom focus styles */
+button:focus, input:focus, select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
